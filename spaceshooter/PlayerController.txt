@@ -1,0 +1,141 @@
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using Unity.VisualScripting;
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+    public float moveSpeed = 5.0f;
+
+    [SerializeField]
+    private GameObject laser_prefab;
+
+    //cretae gameobject for Thrippleshot
+    [SerializeField]
+    private GameObject Thrippleshot_prefab;
+
+    //public powerUp powerUp;
+
+    public bool isTrippleLaserActive = false;
+    public bool isSpeedBoost = false;
+
+    
+    public GameObject Shield_Prefab;
+
+
+
+    private void Start()
+    {
+
+        Shield_Prefab.SetActive(false);
+
+    }
+
+    private void Update()
+    {
+        movePlayer();
+        firePlayer();
+
+    }
+    void movePlayer()
+    {
+        //vertical input(W,S)
+
+        float verticalInput = Input.GetAxis("Vertical");
+
+
+        //horizontal input(A,D)
+
+        float horizontalInput = Input.GetAxis("Horizontal");
+
+        //game boundryline 
+        if (transform.position.y > 4)
+        {
+            transform.position = new Vector3(transform.position.x, 4, 0);
+        }
+        if (transform.position.y < -4)
+        {
+            transform.position = new Vector3(transform.position.x, -4, 0);
+        }
+        if (transform.position.x > 8)
+        {
+            transform.position = new Vector3(-8, transform.position.y, 0);
+        }
+        else if (transform.position.x < -8)
+        {
+            transform.position = new Vector3(8, transform.position.y, 0);
+        }
+        if (isSpeedBoost == true)
+        {
+            transform.Translate(new Vector3(horizontalInput, verticalInput, 0f) * moveSpeed * 2 * Time.deltaTime);
+        }
+        else
+        {
+            transform.Translate(new Vector3(horizontalInput, verticalInput, 0f) * moveSpeed * Time.deltaTime);
+        }
+
+    }
+
+
+
+    void firePlayer()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (isTrippleLaserActive == true)
+            {
+                Instantiate(Thrippleshot_prefab, transform.position, Quaternion.identity);
+            }
+            else
+            {
+                Instantiate(laser_prefab, transform.position + new Vector3(0, 1.2f, 0), Quaternion.identity);
+            }
+        }
+
+
+
+    }
+
+
+
+    public void turnon()
+    {
+        isTrippleLaserActive = true;
+        StartCoroutine(IncreaseSpeedAndDelay());
+    }
+    IEnumerator IncreaseSpeedAndDelay()
+
+    {
+        yield return new WaitForSeconds(5.0f);
+        isTrippleLaserActive = false;
+    }
+    public void turnSpeedBoost()
+    {
+        isSpeedBoost = true;
+        StartCoroutine(IncreaseSpeedAndDelay1());
+    }
+    IEnumerator IncreaseSpeedAndDelay1()
+
+    {
+        yield return new WaitForSeconds(5.0f);
+        isSpeedBoost = false;
+    }
+
+    public void turnOnShield()
+    {
+        Shield_Prefab.SetActive(true);
+        // Instantiate the game object
+        GameObject displayedObject = Instantiate(Shield_Prefab, transform.position, transform.rotation);
+
+        // Destroy the game object after the specified displayTime
+        Destroy(displayedObject, 5.0f);
+    }
+
+   
+
+}
+   
+
+
+
